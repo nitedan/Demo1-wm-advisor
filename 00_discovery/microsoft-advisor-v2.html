@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Microsoft Azure Advisor — WMS/WMP 2026</title>
+<style>
+:root{--bg:#F1F5F9;--surface:#fff;--border:#E2E8F0;--text:#1E293B;--muted:#64748B;--p1:#0078D4;--p1l:#EFF6FF;--p2:#7C3AED;--p2l:#F5F3FF;--p3:#059669;--p3l:#ECFDF5;--chip:#E2E8F0;--radius:8px;--sh:0 1px 3px rgba(0,0,0,.1)}
+[data-dark]{--bg:#0F172A;--surface:#1E293B;--border:#334155;--text:#F1F5F9;--muted:#94A3B8;--chip:#334155;--p1l:#1e3a5f;--p2l:#2d1b69;--p3l:#064e3b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:linear-gradient(100deg,#0B1E3F,#0F2D60 60%,#1A3A6B);color:#fff;padding:0 20px;display:flex;align-items:center;gap:12px;height:52px;flex-shrink:0}
+.topbar-logo{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.topbar-logo span{color:#60A5FA}
+.topbar-sub{font-size:11px;color:#93C5FD;margin-top:1px}
+.topbar-sp{flex:1}
+.tbadge{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:3px 10px;font-size:11px;color:#E0F2FE}
+.tbtn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;color:#fff;cursor:pointer;padding:5px 10px;font-size:11px;font-family:inherit;transition:background .15s}
+.tbtn:hover{background:rgba(255,255,255,.2)}
+.filterbar{background:var(--surface);border-bottom:1px solid var(--border);padding:8px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0}
+.flabel{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+select{font-family:inherit;font-size:12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);cursor:pointer;outline:none}
+select:focus{border-color:var(--p1)}
+.sbox{display:flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 10px;flex:1;min-width:140px;max-width:260px}
+.sbox input{background:none;border:none;outline:none;font-family:inherit;font-size:12px;color:var(--text);width:100%}
+.sbox input::placeholder{color:var(--muted)}
+.breset{font-family:inherit;font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;padding:3px 6px;border-radius:4px}
+.breset:hover{background:var(--chip)}
+.chips{background:var(--surface);border-bottom:1px solid var(--border);padding:5px 20px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-height:32px}
+.chip{display:inline-flex;align-items:center;gap:4px;background:var(--chip);border-radius:12px;padding:2px 10px;font-size:11px;color:var(--muted)}
+.chip-x{cursor:pointer;opacity:.6}.chip-x:hover{opacity:1}
+.chips-empty{font-size:11px;color:var(--muted);font-style:italic}
+.tabs{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;display:flex;gap:0;flex-shrink:0}
+.tab{padding:10px 16px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--p1);border-bottom-color:var(--p1);font-weight:600}
+.app-body{display:flex;flex:1;overflow:hidden}
+.sidebar{width:210px;background:var(--surface);border-right:1px solid var(--border);padding:14px 10px;overflow-y:auto;flex-shrink:0}
+.sb-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);padding:0 8px;margin-bottom:8px}
+.sb-item{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:6px;cursor:pointer;font-size:12px;color:var(--text);transition:all .15s;border:none;background:none;width:100%;text-align:left;font-family:inherit}
+.sb-item:hover{background:var(--chip)}
+.sb-item.active{background:var(--p1l);color:var(--p1);font-weight:600}
+.sb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sb-badge{margin-left:auto;background:var(--chip);border-radius:10px;padding:1px 6px;font-size:10px;font-weight:600;color:var(--muted)}
+.sb-div{height:1px;background:var(--border);margin:10px 0}
+.main{flex:1;overflow-y:auto;padding:20px}
+.panel{display:none}
+.panel.active{display:block}
+
+/* PRODUCT CARDS */
+.grid-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.grid-count{font-size:12px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.ph{grid-column:1/-1;display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--radius);border-left:4px solid;margin-bottom:4px}
+.ph.p1{background:var(--p1l);border-color:var(--p1)}
+.ph.p2{background:var(--p2l);border-color:var(--p2)}
+.ph.p3{background:var(--p3l);border-color:var(--p3)}
+.ph h3{font-size:14px;font-weight:700}
+.ph p{font-size:11px;color:var(--muted);margin-top:1px}
+.ph-count{margin-left:auto;font-size:11px;font-weight:600;background:rgba(255,255,255,.5);border-radius:10px;padding:2px 10px}
+[data-dark] .ph-count{background:rgba(0,0,0,.3)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;transition:all .18s;position:relative;border-left:3px solid}
+.card:hover{box-shadow:0 4px 12px rgba(0,0,0,.1);transform:translateY(-1px)}
+.card.p1{border-left-color:var(--p1)}
+.card.p2{border-left-color:var(--p2)}
+.card.p3{border-left-color:var(--p3)}
+.card.expanded{grid-column:span 2}
+.card-top{display:flex;align-items:flex-start;gap:9px;margin-bottom:8px}
+.card-icon{width:34px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.card-name{font-size:13px;font-weight:700;line-height:1.3}
+.card-cat{font-size:10px;color:var(--muted);margin-top:1px;text-transform:uppercase;letter-spacing:.4px}
+.card-badges{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px}
+.tier-badge{font-size:10px;font-weight:600;border-radius:4px;padding:2px 7px}
+.t-free{background:#DCFCE7;color:#15803D}
+.t-budget{background:#CFFAFE;color:#0E7490}
+.t-standard{background:#DBEAFE;color:#1D4ED8}
+.t-premium{background:#FEF3C7;color:#B45309}
+.t-variable{background:#F1F5F9;color:#475569}
+[data-dark] .t-free{background:#14532D;color:#86EFAC}
+[data-dark] .t-budget{background:#164E63;color:#67E8F9}
+[data-dark] .t-standard{background:#1E3A8A;color:#93C5FD}
+[data-dark] .t-premium{background:#78350F;color:#FCD34D}
+[data-dark] .t-variable{background:#334155;color:#94A3B8}
+.badge-new{background:#FEF3C7;color:#92400E;font-size:9px;font-weight:700;border-radius:4px;padding:2px 6px;text-transform:uppercase}
+[data-dark] .badge-new{background:#78350F;color:#FCD34D}
+.card-price{font-size:11px;color:var(--muted);margin-bottom:6px}
+.card-price strong{color:var(--text);font-weight:600}
+.card-desc{font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:8px}
+.waf-row{display:flex;gap:8px;margin-bottom:8px}
+.waf-item{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1}
+.waf-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+.waf-dots{display:flex;gap:2px}
+.waf-dot{width:8px;height:4px;border-radius:2px;background:var(--border)}
+.waf-dot.on{background:var(--p1)}
+.card.p2 .waf-dot.on{background:var(--p2)}
+.card.p3 .waf-dot.on{background:var(--p3)}
+.card-tags{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:6px}
+.tag{font-size:10px;background:var(--chip);border-radius:4px;padding:1px 5px;color:var(--muted)}
+.card-arrow{position:absolute;bottom:9px;right:11px;font-size:10px;color:var(--muted);transition:transform .18s}
+.card.expanded .card-arrow{transform:rotate(180deg)}
+.card-cmp-btn{position:absolute;bottom:8px;right:60px;font-size:10px;color:var(--p1);background:var(--p1l);border:1px solid rgba(0,120,212,.2);border-radius:4px;padding:2px 8px;cursor:pointer;opacity:0;transition:opacity .15s}
+.card:hover .card-cmp-btn{opacity:1}
+.card.in-compare .card-cmp-btn{opacity:1;background:var(--p1);color:#fff}
+.detail{display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.card.expanded .detail{display:block}
+.dg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ds{background:var(--bg);border-radius:6px;padding:9px 11px}
+.ds h4{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:6px}
+.ds li{font-size:11px;padding:2px 0;list-style:none;display:flex;gap:5px}
+.ds li::before{content:"›";color:var(--p1);font-weight:700}
+
+/* COMPARE TRAY */
+.cmp-tray{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:2px solid var(--p1);padding:10px 20px;display:flex;align-items:center;gap:12px;z-index:100;box-shadow:0 -4px 12px rgba(0,0,0,.1);transform:translateY(100%);transition:transform .2s}
+.cmp-tray.visible{transform:translateY(0)}
+.cmp-slot{width:160px;height:40px;border:1.5px dashed var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted)}
+.cmp-slot.filled{border-style:solid;border-color:var(--p1);background:var(--p1l);color:var(--p1);font-weight:600;padding:0 8px;position:relative}
+.cmp-slot-x{position:absolute;right:5px;cursor:pointer;opacity:.6}
+.cmp-slot-x:hover{opacity:1}
+.cmp-sp{flex:1}
+.btn-cmp{background:var(--p1);color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-cmp:hover{background:#005A9E}
+.btn-cmp-clear{background:none;border:1px solid var(--border);border-radius:6px;padding:7px 14px;font-size:12px;cursor:pointer;color:var(--muted);font-family:inherit}
+
+/* COMPARE PANEL */
+.cmp-table{width:100%;border-collapse:collapse;background:var(--surface);border-radius:var(--radius);overflow:hidden;box-shadow:var(--sh)}
+.cmp-table th{background:var(--bg);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.cmp-table td{padding:9px 14px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:top}
+.cmp-table tr:last-child td{border-bottom:none}
+.cmp-table .row-hdr td{background:var(--bg);font-weight:700;font-size:11px;color:var(--muted)}
+.waf-bar{height:6px;border-radius:3px;background:var(--p1);display:inline-block}
+
+/* DECISION GUIDE */
+.dg-wrap{max-width:980px}
+.dg-wrap h2{font-size:16px;font-weight:700;margin-bottom:5px}
+.dg-intro{font-size:12px;color:var(--muted);margin-bottom:16px}
+.dg-search{position:relative;margin-bottom:14px}
+.dg-search input{width:100%;padding:9px 12px 9px 34px;font-family:inherit;font-size:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);outline:none}
+.dg-search input:focus{border-color:var(--p1)}
+.dg-search-ic{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.dtable{width:100%;border-collapse:collapse;background:var(--surface);border-radius:var(--radius);overflow:hidden;box-shadow:var(--sh)}
+.dtable th{background:var(--bg);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);padding:9px 13px;text-align:left;border-bottom:1px solid var(--border)}
+.dtable td{padding:9px 13px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:top}
+.dtable tr:last-child td{border-bottom:none}
+.dtable tr:hover td{background:var(--bg)}
+.dprod{display:inline-block;border-radius:4px;padding:1px 7px;font-size:10px;font-weight:700;margin-right:3px;margin-bottom:2px}
+
+/* COST SCENARIOS */
+.scen-tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.stab{padding:7px 15px;border-radius:var(--radius);border:1px solid var(--border);font-size:12px;font-weight:600;cursor:pointer;background:var(--surface);color:var(--muted);font-family:inherit}
+.stab.active{background:var(--p1);color:#fff;border-color:var(--p1)}
+.spanel{display:none}
+.spanel.active{display:block}
+.shdr{background:linear-gradient(135deg,#0B1E3F,#1A3A6B);color:#fff;border-radius:var(--radius);padding:18px 22px;margin-bottom:18px;display:flex;align-items:center;gap:20px}
+.shdr h3{font-size:17px;font-weight:700}
+.shdr p{font-size:11px;color:#93C5FD;margin-top:3px}
+.shdr-tot{margin-left:auto;text-align:right}
+.shdr-amt{font-size:26px;font-weight:700;color:#60A5FA}
+.shdr-lbl{font-size:10px;color:#93C5FD}
+.ctable{width:100%;border-collapse:collapse;background:var(--surface);border-radius:var(--radius);overflow:hidden;box-shadow:var(--sh);margin-bottom:14px}
+.ctable th{background:var(--bg);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);padding:9px 13px;text-align:left;border-bottom:1px solid var(--border)}
+.ctable td{padding:8px 13px;border-bottom:1px solid var(--border);font-size:12px}
+.ctable .sec-row td{background:var(--p1l);color:var(--p1);font-weight:700;font-size:11px}
+.ctable .sub-row td{background:var(--bg);font-weight:700}
+.ctable .tot-row td{background:linear-gradient(90deg,#0B1E3F,#1A3A6B);color:#fff;font-weight:700;font-size:13px}
+.cnote{font-size:11px;color:var(--muted);background:var(--bg);border-radius:6px;padding:9px 13px;border-left:3px solid var(--p1)}
+
+/* ARCHITECTURE DIAGRAM */
+.arch-wrap{display:flex;flex-direction:column;gap:14px}
+.arch-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.arch-toolbar h2{font-size:16px;font-weight:700;flex:1}
+.abtn{font-family:inherit;font-size:11px;font-weight:600;border-radius:6px;padding:6px 14px;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text)}
+.abtn:hover{background:var(--bg)}
+.abtn.primary{background:var(--p1);color:#fff;border-color:var(--p1)}
+.abtn.primary:hover{background:#005A9E}
+.canvas-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+canvas{display:block;width:100%;height:auto}
+.arch-note{font-size:11px;color:var(--muted);background:var(--bg);border-radius:6px;padding:8px 12px;border-left:3px solid var(--p2)}
+
+/* STATUSBAR */
+.statusbar{background:var(--surface);border-top:1px solid var(--border);padding:5px 20px;display:flex;align-items:center;gap:14px;font-size:11px;color:var(--muted);flex-shrink:0}
+.sdot{width:6px;height:6px;border-radius:50%;background:#16A34A}
+.sb-r{margin-left:auto;display:flex;gap:14px}
+.statusbar a{color:var(--muted);text-decoration:none}
+.statusbar a:hover{color:var(--text)}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+@media(max-width:720px){.sidebar{display:none}.grid{grid-template-columns:1fr}.card.expanded{grid-column:span 1}}
+@media print{.topbar,.filterbar,.chips,.tabs,.sidebar,.statusbar,.cmp-tray{display:none!important}.main{padding:0}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="topbar-logo">Microsoft Azure Advisor <span>· WMS/WMP</span></div>
+    <div class="topbar-sub">Waste Management Platform — AI &amp; Apps · Data · Infrastructure</div>
+  </div>
+  <div class="topbar-sp"></div>
+  <span class="tbadge">Build 2026 + Rayfin</span>
+  <button class="tbtn" onclick="toggleDark()">◑ Dark</button>
+  <button class="tbtn" onclick="window.print()">↓ PDF</button>
+</div>
+
+<div class="filterbar">
+  <span class="flabel">Filter:</span>
+  <select id="f-pillar" onchange="applyFilters()">
+    <option value="">All Pillars</option>
+    <option value="p1">AI &amp; Apps</option>
+    <option value="p2">Data</option>
+    <option value="p3">Infrastructure</option>
+  </select>
+  <select id="f-tier" onchange="applyFilters()">
+    <option value="">All Cost Tiers</option>
+    <option value="free">Free / Included</option>
+    <option value="budget">Budget</option>
+    <option value="standard">Standard</option>
+    <option value="premium">Premium</option>
+    <option value="variable">Variable</option>
+  </select>
+  <select id="f-uc" onchange="applyFilters()">
+    <option value="">All Use Cases</option>
+    <option value="uc01">UC-01 Onboarding</option>
+    <option value="uc02">UC-02 Supplier Matching</option>
+    <option value="uc03">UC-03 ESG Reporting</option>
+    <option value="uc04">UC-04 RFP Automation</option>
+    <option value="uc05">UC-05 Document Intelligence</option>
+    <option value="uc06">UC-06 Knowledge Agent</option>
+    <option value="uc07">UC-07 Anomaly Detection</option>
+  </select>
+  <select id="f-waf" onchange="applyFilters()">
+    <option value="">All WAF Pillars</option>
+    <option value="cost">Cost Optimized (≥4)</option>
+    <option value="sec">Highly Secure (≥4)</option>
+    <option value="rel">Highly Reliable (≥4)</option>
+  </select>
+  <div class="sbox">
+    <span style="color:var(--muted)">⌕</span>
+    <input type="text" id="s-input" placeholder="Search products…" oninput="applyFilters()">
+  </div>
+  <button class="breset" onclick="resetFilters()">✕ Reset</button>
+</div>
+
+<div class="chips" id="chips-bar">
+  <span class="chips-empty" id="chips-empty">Showing all 38 products — click any card to expand</span>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('products',this)">Products</div>
+  <div class="tab" onclick="switchTab('compare',this)">Compare <span id="cmp-count-tab"></span></div>
+  <div class="tab" onclick="switchTab('decision',this)">Decision Guide</div>
+  <div class="tab" onclick="switchTab('costs',this)">Cost Scenarios</div>
+  <div class="tab" onclick="switchTab('arch',this)">Architecture Diagram</div>
+</div>
+
+<div class="app-body">
+  <div class="sidebar">
+    <div style="margin-bottom:16px">
+      <div class="sb-title">Pillars</div>
+      <button class="sb-item active" onclick="sbPillar('',this)"><span class="sb-dot" style="background:#0078D4"></span>All Products<span class="sb-badge" id="cnt-all">38</span></button>
+      <button class="sb-item" onclick="sbPillar('p1',this)"><span class="sb-dot" style="background:#0078D4"></span>AI &amp; Apps<span class="sb-badge" id="cnt-p1">13</span></button>
+      <button class="sb-item" onclick="sbPillar('p2',this)"><span class="sb-dot" style="background:#7C3AED"></span>Data<span class="sb-badge" id="cnt-p2">12</span></button>
+      <button class="sb-item" onclick="sbPillar('p3',this)"><span class="sb-dot" style="background:#059669"></span>Infrastructure<span class="sb-badge" id="cnt-p3">13</span></button>
+    </div>
+    <div class="sb-div"></div>
+    <div style="margin-bottom:16px">
+      <div class="sb-title">Cost Tier</div>
+      <button class="sb-item" onclick="sbTier('free',this)"><span style="color:#16A34A">●</span>Free / Included</button>
+      <button class="sb-item" onclick="sbTier('budget',this)"><span style="color:#0891B2">●</span>Budget</button>
+      <button class="sb-item" onclick="sbTier('standard',this)"><span style="color:#2563EB">●</span>Standard</button>
+      <button class="sb-item" onclick="sbTier('premium',this)"><span style="color:#D97706">●</span>Premium</button>
+      <button class="sb-item" onclick="sbTier('variable',this)"><span style="color:#6B7280">●</span>Variable</button>
+    </div>
+    <div class="sb-div"></div>
+    <div>
+      <div class="sb-title">Build 2026 New</div>
+      <button class="sb-item" onclick="sbNew(this)">⭐ New in Build 2026</button>
+    </div>
+    <div class="sb-div"></div>
+    <div>
+      <div class="sb-title">Navigate</div>
+      <button class="sb-item" onclick="switchTab('decision',document.querySelectorAll('.tab')[2])">🧭 Decision Guide</button>
+      <button class="sb-item" onclick="switchTab('costs',document.querySelectorAll('.tab')[3])">💰 Cost Scenarios</button>
+      <button class="sb-item" onclick="switchTab('arch',document.querySelectorAll('.tab')[4])">🏗️ Architecture</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="panel active" id="tab-products">
+      <div class="grid-hdr"><div class="grid-count" id="grid-count">38 products across 3 pillars</div></div>
+      <div class="grid" id="pgrid"></div>
+    </div>
+
+    <div class="panel" id="tab-compare">
+      <h2 style="font-size:16px;font-weight:700;margin-bottom:6px">Product Comparison</h2>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:18px">Select up to 3 products using the Compare button on any card, then switch to this tab.</p>
+      <div id="cmp-content"><p style="color:var(--muted);font-size:12px">No products selected yet. Go to Products tab, hover a card, and click Compare.</p></div>
+    </div>
+
+    <div class="panel" id="tab-decision">
+      <div class="dg-wrap">
+        <h2>Decision Guide — "I need to…"</h2>
+        <p class="dg-intro">Find the right Azure product for your WMS/WMP need. Use search to filter.</p>
+        <div class="dg-search"><span class="dg-search-ic">⌕</span><input type="text" placeholder="Search needs, products, or keywords…" oninput="filterDecision(this.value)"></div>
+        <table class="dtable"><thead><tr><th>I need to…</th><th>Product(s)</th><th>Cost signal</th><th>WMS/WMP context</th></tr></thead><tbody id="dtbody"></tbody></table>
+      </div>
+    </div>
+
+    <div class="panel" id="tab-costs">
+      <h2 style="font-size:16px;font-weight:700;margin-bottom:5px">Cost Scenarios</h2>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:18px">Verified June 2026 Microsoft list prices · West Europe region · EUR (€1 ≈ $1.08)</p>
+      <div class="scen-tabs">
+        <button class="stab active" onclick="switchScen('mvp',this)">MVP (~10 suppliers)</button>
+        <button class="stab" onclick="switchScen('pilot',this)">Pilot (~100 suppliers)</button>
+        <button class="stab" onclick="switchScen('scale',this)">Scale-out (~1,000 suppliers)</button>
+      </div>
+      <div id="scen-mvp" class="spanel active"></div>
+      <div id="scen-pilot" class="spanel"></div>
+      <div id="scen-scale" class="spanel"></div>
+    </div>
+
+    <div class="panel" id="tab-arch">
+      <div class="arch-wrap">
+        <div class="arch-toolbar">
+          <h2>Architecture Diagram — 3-Pillar View</h2>
+          <button class="abtn primary" onclick="exportPNG()">↓ Export PNG</button>
+          <button class="abtn" onclick="exportSVG()">↓ Export SVG</button>
+          <select id="arch-view" onchange="drawDiagram()" style="font-size:12px">
+            <option value="pillars">3-Pillar Overview</option>
+            <option value="layers">Layered Architecture</option>
+          </select>
+        </div>
+        <div class="canvas-wrap"><canvas id="arch-canvas"></canvas></div>
+        <p class="arch-note">Diagram renders all 38 products grouped by pillar. Export as PNG (print-quality 2×) or vector SVG for use in presentations. Switch view to see layered architecture.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPARE TRAY -->
+<div class="cmp-tray" id="cmp-tray">
+  <strong style="font-size:12px;white-space:nowrap">Compare:</strong>
+  <div id="cmp-s0" class="cmp-slot">+ Select a product</div>
+  <div id="cmp-s1" class="cmp-slot">+ Select a product</div>
+  <div id="cmp-s2" class="cmp-slot">+ Select a product</div>
+  <div class="cmp-sp"></div>
+  <button class="btn-cmp-clear" onclick="clearCompare()">Clear</button>
+  <button class="btn-cmp" onclick="showCompare()">Compare Now →</button>
+</div>
+
+<div class="statusbar">
+  <span class="sdot"></span>
+  <span>38 Microsoft products · June 2026 list prices · West Europe</span>
+  <span>·</span><span>Build 2026 + Rayfin (Public Preview)</span>
+  <div class="sb-r">
+    <span>Microsoft Azure Advisor v2</span>
+    <a href="https://linkedin.com/in/nitedan" target="_blank">@nitedan</a>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════
+const PC = {p1:'#0078D4',p2:'#7C3AED',p3:'#059669'};
+const PL = {p1:'AI & Apps',p2:'Data',p3:'Infrastructure'};
+
+const PRODS = [
+// ── PILLAR 1 ──────────────────────────────────────
+{id:'nano',pillar:'p1',name:'GPT-4.1-nano',cat:'Language Model',icon:'🤖',tier:'budget',isNew:false,
+ price:'$0.10/1M in · $0.40/1M out',
+ desc:'Fastest, cheapest OpenAI model. Classification, intent routing, language detect, bulk labelling.',
+ waf:{cost:5,rel:4,sec:4,ops:5,perf:5},tags:['Azure OpenAI','T1'],
+ uc:['uc01','uc02','uc03','uc04','uc05','uc06','uc07'],
+ pros:['Lowest latency','Lowest cost','Sufficient for routing+classification'],
+ cons:['Not for complex reasoning','Short context'],bestFor:'Document classify, intent routing, language detect'},
+
+{id:'mini',pillar:'p1',name:'GPT-4o-mini',cat:'Language Model',icon:'🤖',tier:'budget',isNew:false,
+ price:'$0.15/1M in · $0.60/1M out',
+ desc:'Cost-efficient mid-tier. Structured extraction, invoice parsing, form Q&A.',
+ waf:{cost:5,rel:4,sec:4,ops:5,perf:4},tags:['Azure OpenAI','T2'],
+ uc:['uc01','uc04','uc05'],
+ pros:['Great price/quality ratio','128K context','Solid extraction'],
+ cons:['Weaker on ambiguous multi-page docs'],bestFor:'Invoice extraction, simple cert parsing, onboarding Q&A'},
+
+{id:'gpt4o',pillar:'p1',name:'GPT-4o',cat:'Language Model',icon:'🧠',tier:'standard',isNew:false,
+ price:'$2.50/1M in · $10.00/1M out',
+ desc:'Flagship multimodal model. Complex multi-page extraction, RFP analysis, ESG narrative.',
+ waf:{cost:2,rel:5,sec:4,ops:4,perf:5},tags:['Azure OpenAI','T3','multimodal'],
+ uc:['uc03','uc04','uc05','uc06'],
+ pros:['Best reasoning quality','Multimodal','128K context'],
+ cons:['25× cost of nano','Reserve for high-value tasks'],bestFor:'Complex permit extraction, RFP requirements, ESG narrative'},
+
+{id:'gpt41',pillar:'p1',name:'GPT-4.1',cat:'Language Model',icon:'🧠',tier:'standard',isNew:false,
+ price:'~$2.00/1M in · ~$8.00/1M out',
+ desc:'Latest GPT-4 generation. Improved structured output and instruction following.',
+ waf:{cost:2,rel:5,sec:4,ops:4,perf:5},tags:['Azure OpenAI','T3'],
+ uc:['uc04','uc05','uc06'],
+ pros:['Better structured output','Improved schema adherence'],
+ cons:['Similar cost to GPT-4o'],bestFor:'RFP analysis, complex document schemas'},
+
+{id:'phi4',pillar:'p1',name:'Phi-4-mini',cat:'Language Model',icon:'⚡',tier:'budget',isNew:false,
+ price:'$0.07/1M in · $0.23/1M out',
+ desc:'Microsoft open-source SLM. Cheapest option, self-hostable on Container Apps.',
+ waf:{cost:5,rel:3,sec:5,ops:3,perf:4},tags:['Microsoft','T1','self-hostable'],
+ uc:['uc05','uc07'],
+ pros:['Cheapest on market','Self-hostable','Data sovereignty'],
+ cons:['Weaker reasoning','Less multilingual'],bestFor:'Bulk anomaly pre-labelling, on-premises deployments'},
+
+{id:'foundry',pillar:'p1',name:'Azure AI Foundry',cat:'AI Platform',icon:'🏭',tier:'variable',isNew:false,
+ price:'Free platform · pay per model use',
+ desc:'Unified AI platform: model catalog, Agent Service, Foundry Observability, evaluation pipelines.',
+ waf:{cost:4,rel:5,sec:5,ops:5,perf:5},tags:['AI platform','agents','observability'],
+ uc:['uc01','uc02','uc03','uc04','uc05','uc06','uc07'],
+ pros:['Unified agent + eval','Foundry Observability with Fabric Agents','Model catalog: OpenAI + Phi + Llama'],
+ cons:['Agent Service in preview'],bestFor:'All agentic AI workloads, evaluation pipelines, model routing'},
+
+{id:'copilot',pillar:'p1',name:'Copilot Studio',cat:'Conversational AI',icon:'💬',tier:'standard',isNew:false,
+ price:'$200/tenant/mo + $0.0004–$0.04/message',
+ desc:'Low-code agent builder. Teams/SharePoint/M365 integration. Powers knowledge agent and onboarding bot.',
+ waf:{cost:3,rel:4,sec:4,ops:5,perf:4},tags:['agent builder','M365','low-code'],
+ uc:['uc01','uc04','uc06'],
+ pros:['Teams/M365 native','Low-code + Power Automate','Entra auth built-in'],
+ cons:['Complex reasoning needs AI Foundry backend','$0.80/login at Power Pages scale'],bestFor:'Knowledge agent (UC-06), onboarding bot (UC-01)'},
+
+{id:'docint',pillar:'p1',name:'AI Document Intelligence',cat:'Document AI',icon:'📄',tier:'standard',isNew:false,
+ price:'$1.50–$30/1K pages (model dependent)',
+ desc:'Prebuilt and custom models for invoices, permits, certificates, contracts.',
+ waf:{cost:3,rel:5,sec:4,ops:5,perf:4},tags:['document extraction','OCR','prebuilt'],
+ uc:['uc01','uc04','uc05'],
+ pros:['Prebuilt invoice/receipt models','Custom model training','High accuracy on structured forms'],
+ cons:['Custom models need labelled data','Complex permits may need GPT-4o'],bestFor:'All document types UC-05, invoice processing UC-04'},
+
+{id:'fabriciq',pillar:'p1',name:'Fabric IQ',cat:'NL Intelligence',icon:'✨',tier:'variable',isNew:true,
+ price:'Included with Fabric F-SKU · Copilot add-on $30/user/mo',
+ desc:'Build 2026: NL querying over Power BI semantic models. Powers M365 Copilot Chat with live business data.',
+ waf:{cost:4,rel:4,sec:4,ops:5,perf:4},tags:['Build 2026','Fabric','NL query'],
+ uc:['uc02','uc03','uc07'],
+ pros:['NL over existing Power BI models','M365 Copilot Chat integration','No custom LLM calls'],
+ cons:['Requires well-built semantic model','Copilot add-on cost per user'],bestFor:'ESG NL queries (UC-03), anomaly queries (UC-07)'},
+
+{id:'pa',pillar:'p1',name:'Power Automate Premium',cat:'Process Automation',icon:'⚡',tier:'standard',isNew:false,
+ price:'$15/user/mo · AI Builder: $500/unit/mo',
+ desc:'Document approval flows, cert expiry notifications. Triggered by Fabric Eventstreams.',
+ waf:{cost:3,rel:4,sec:4,ops:5,perf:3},tags:['automation','M365','flows'],
+ uc:['uc01','uc03','uc04','uc05'],
+ pros:['M365/SharePoint triggers','Eventstream integration'],
+ cons:['Complex logic better in code','Per-user licensing'],bestFor:'Onboarding approval flow, document lifecycle (UC-05)'},
+
+{id:'papps',pillar:'p1',name:'Power Apps Premium',cat:'Business Apps',icon:'📱',tier:'standard',isNew:false,
+ price:'$20/user/mo · Power Pages: $200/site/mo + $0.80/login',
+ desc:'Internal operator portal and supplier onboarding portal (Power Pages). Dataverse-native.',
+ waf:{cost:3,rel:4,sec:4,ops:5,perf:3},tags:['low-code','portal','Dataverse'],
+ uc:['uc01','uc02'],
+ pros:['Rapid portal development','Dataverse native','Responsive'],
+ cons:['$0.80/login expensive at scale — use Entra External ID'],bestFor:'Internal operator dashboards, supplier self-service portal'},
+
+{id:'rayfin',pillar:'p1',name:'Rayfin',cat:'Backend-as-a-Service',icon:'🚀',tier:'variable',isNew:true,
+ price:'Public preview · Fabric F-SKU compute applies',
+ desc:'Build 2026: TypeScript BaaS on Fabric. `npx rayfin up` → SQL DB + Entra auth + GraphQL/REST + OneLake. Zero ETL.',
+ waf:{cost:4,rel:3,sec:4,ops:4,perf:4},tags:['Build 2026','BaaS','TypeScript','GraphQL'],
+ uc:['uc01','uc02','uc03','uc04','uc07'],
+ pros:['Zero ETL to OneLake','Entra auth built-in','GitHub-native CI/CD','No custom Azure provisioning'],
+ cons:['Public preview','RBAC not yet released','TypeScript only'],bestFor:'Onboarding API, DocumentStatus, SupplierMatch, Tender, ESGMetric, AnomalyAlert APIs'},
+
+{id:'ghcp',pillar:'p1',name:'GitHub Copilot Business',cat:'Developer Tools',icon:'🖥️',tier:'standard',isNew:false,
+ price:'$19/user/mo',
+ desc:'AI pair programmer. Accelerates Rayfin TypeScript backends, FastAPI Python services, Fabric pipelines.',
+ waf:{cost:4,rel:5,sec:5,ops:5,perf:5},tags:['dev tools','coding','TypeScript','Python'],
+ uc:[],
+ pros:['IDE-native suggestions','PR summaries','Multi-language'],
+ cons:['No production deployment'],bestFor:'All developers — Rayfin + FastAPI + Fabric pipeline authoring'},
+
+// ── PILLAR 2 ──────────────────────────────────────
+{id:'fabf8',pillar:'p2',name:'Fabric F8',cat:'Data Platform',icon:'🔷',tier:'standard',isNew:false,
+ price:'PAYG $0.36/CU·hr (~€260/mo) · 1-yr Reserved ~€151/mo',
+ desc:'Entry Fabric SKU. Data Factory, Lakehouses, Power BI, Eventstreams. MVP/Pilot with 1–2 concurrent workloads.',
+ waf:{cost:4,rel:4,sec:4,ops:4,perf:3},tags:['Fabric','OneLake','Power BI'],
+ uc:['uc01','uc02','uc03','uc04','uc05','uc06','uc07'],
+ pros:['Includes all Fabric experiences','41% saving with 1-yr Reserved'],
+ cons:['May be underpowered for concurrent GPU DW'],bestFor:'MVP deployment — all Fabric at minimal cost'},
+
+{id:'fabf16',pillar:'p2',name:'Fabric F16',cat:'Data Platform',icon:'🔷',tier:'standard',isNew:false,
+ price:'PAYG $0.72/CU·hr (~€520/mo) · 1-yr Reserved ~€303/mo',
+ desc:'Mid-tier Fabric SKU. Concurrent Eventstreams, Data Factory, Lakehouse queries, GPU DW workloads.',
+ waf:{cost:3,rel:5,sec:4,ops:5,perf:4},tags:['Fabric','OneLake','Power BI','GPU'],
+ uc:['uc01','uc02','uc03','uc04','uc05','uc06','uc07'],
+ pros:['Concurrent workloads','GPU DW AI functions','50–200 active users'],
+ cons:['2× cost of F8'],bestFor:'Pilot (100 suppliers) — full Fabric capability'},
+
+{id:'onelake',pillar:'p2',name:'OneLake',cat:'Data Lake',icon:'🏔️',tier:'budget',isNew:false,
+ price:'Hot $0.023/GB/mo · Cool $0.0045/GB/mo',
+ desc:'Single organizational data lake. All Rayfin data, mirrored DBs, document metadata land here. Delta Parquet, DirectLake for Power BI.',
+ waf:{cost:5,rel:5,sec:5,ops:5,perf:5},tags:['data lake','Delta','DirectLake'],
+ uc:['uc01','uc02','uc03','uc04','uc05','uc06','uc07'],
+ pros:['No data movement cost','DirectLake = no refresh','Single governance scope'],
+ cons:['Hot tier grows with volume'],bestFor:'Architecture backbone — every service reads/writes OneLake'},
+
+{id:'mirror',pillar:'p2',name:'OneLake Mirroring',cat:'Data Integration',icon:'🔄',tier:'budget',isNew:true,
+ price:'Included with Fabric F-SKU · source egress applies',
+ desc:'Build 2026: Near real-time replication from Azure SQL, SharePoint Lists, SQL Server 2016–2022, SAP via Workspace Private Link.',
+ waf:{cost:5,rel:4,sec:5,ops:5,perf:4},tags:['Build 2026','replication','no-ETL'],
+ uc:['uc01','uc02','uc03'],
+ pros:['Replaces ETL pipelines','Private Link — no public exposure','SharePoint Lists mirroring'],
+ cons:['Read-only replica','Near-real-time, not CDC'],bestFor:'Mirror Azure SQL + SharePoint → OneLake'},
+
+{id:'adf',pillar:'p2',name:'Data Factory (Fabric)',cat:'Data Integration',icon:'🏗️',tier:'variable',isNew:true,
+ price:'Included in Fabric F-SKU · activity compute',
+ desc:'Build 2026: Agent-Ready — AI agents author, operate, diagnose pipelines. For transformations not covered by Mirroring.',
+ waf:{cost:4,rel:4,sec:4,ops:4,perf:4},tags:['Build 2026','pipelines','Agent-Ready'],
+ uc:['uc05'],
+ pros:['Agent-authored pipelines','Self-repair AI diagnostics','800+ connectors'],
+ cons:['Agent authoring still maturing'],bestFor:'Document ingestion pipeline, new-country pipeline authoring by Agent'},
+
+{id:'evtstr',pillar:'p2',name:'Fabric Eventstreams',cat:'Real-time Data',icon:'⚡',tier:'variable',isNew:true,
+ price:'Included in Fabric F-SKU · Streaming CUs',
+ desc:'Build 2026: Change Feeds from Mirrored DBs → Eventstreams. Real-time cert expiry, document lifecycle, anomaly detection.',
+ waf:{cost:4,rel:4,sec:4,ops:4,perf:5},tags:['Build 2026','streaming','Change Feeds'],
+ uc:['uc01','uc03','uc05','uc07'],
+ pros:['Zero-ETL via Change Feeds','Power Automate integration','Sub-minute latency'],
+ cons:['Streaming CU consumption must be monitored'],bestFor:'Cert expiry → alert, doc state → approval, transaction → anomaly'},
+
+{id:'gpudw',pillar:'p2',name:'Fabric DW (GPU + T-SQL AI)',cat:'Analytics',icon:'🖥️',tier:'standard',isNew:true,
+ price:'Included in Fabric F-SKU (F16+ for GPU AI)',
+ desc:'Build 2026: GPU-accelerated T-SQL AI functions — text analytics, entity extraction, classification in SQL. No per-record LLM calls.',
+ waf:{cost:4,rel:4,sec:4,ops:4,perf:5},tags:['Build 2026','GPU','T-SQL AI'],
+ uc:['uc03','uc05','uc07'],
+ pros:['Bulk AI without per-call cost','Familiar T-SQL','Integrated with OneLake Delta'],
+ cons:['F16+ SKU needed','AI functions still expanding'],bestFor:'Bulk document classify (UC-05), batch ESG entity extraction (UC-03)'},
+
+{id:'fagents',pillar:'p2',name:'Fabric Data Agents',cat:'AI on Data',icon:'🤖',tier:'variable',isNew:true,
+ price:'Included in Fabric F-SKU + model costs',
+ desc:'Build 2026: Service principal auth (no user delegation), Foundry Observability. NL → SQL on OneLake in agentic workflows.',
+ waf:{cost:4,rel:4,sec:4,ops:5,perf:4},tags:['Build 2026','agents','service principal'],
+ uc:['uc02','uc03','uc06','uc07'],
+ pros:['Service principal — safe for automation','Foundry Observability unified with OpenAI','NL → SQL on OneLake'],
+ cons:['GA scope expanding','Requires well-defined semantic model'],bestFor:'Expert Knowledge Agent structured data (UC-06), ESG Evidence Agent (UC-03)'},
+
+{id:'pbi',pillar:'p2',name:'Power BI Pro',cat:'Analytics',icon:'📊',tier:'standard',isNew:false,
+ price:'$10/user/mo · Premium Per User: $20/user/mo',
+ desc:'Analytics layer for all WMS/WMP dashboards. DirectLake from OneLake — no import refresh needed.',
+ waf:{cost:4,rel:4,sec:4,ops:5,perf:4},tags:['analytics','dashboards','DirectLake'],
+ uc:['uc02','uc03','uc07'],
+ pros:['DirectLake on OneLake','Fabric IQ NL queries','Teams embedding'],
+ cons:['Per-user license grows at scale'],bestFor:'ESG dashboard (UC-03), anomaly dashboard (UC-07)'},
+
+{id:'aisearch',pillar:'p2',name:'Azure AI Search S1',cat:'Search & RAG',icon:'🔍',tier:'standard',isNew:false,
+ price:'$250/mo (S1 · ~23GB · 3 replicas)',
+ desc:'Hybrid keyword + semantic search with vector indexing. Core RAG retrieval for knowledge agent (UC-06).',
+ waf:{cost:3,rel:5,sec:4,ops:5,perf:5},tags:['RAG','search','vector','hybrid'],
+ uc:['uc06'],
+ pros:['Hybrid: keyword + semantic + vector','Metadata filtering','Integrated reranker'],
+ cons:['S1 ~$250/mo — try Basic ($75) for MVP'],bestFor:'Expert Knowledge Agent RAG retrieval (UC-06)'},
+
+{id:'purview',pillar:'p2',name:'Microsoft Purview',cat:'Governance',icon:'🛡️',tier:'standard',isNew:false,
+ price:'Data Map $0.496/CU·hr · Sensitivity labels: M365 E3+',
+ desc:'Data governance: sensitivity labeling, data lineage, classification across OneLake, SharePoint, Azure SQL.',
+ waf:{cost:3,rel:4,sec:5,ops:4,perf:4},tags:['governance','compliance','EU AI Act'],
+ uc:['uc03'],
+ pros:['Native Fabric + OneLake integration','EU AI Act audit trail'],
+ cons:['Data Map cost grows with assets'],bestFor:'ESG governance (UC-03), EU AI Act documentation'},
+
+{id:'cosmos',pillar:'p2',name:'Azure Cosmos DB',cat:'Operational DB',icon:'🌐',tier:'variable',isNew:false,
+ price:'Serverless $0.25/1M RU · Provisioned $6/100 RU/s/mo',
+ desc:'Agent Memory Toolkit (Durable Functions + Cosmos DB + Foundry) for persistent multi-turn agent memory.',
+ waf:{cost:4,rel:5,sec:5,ops:4,perf:5},tags:['agent memory','NoSQL','serverless'],
+ uc:['uc01','uc04','uc06'],
+ pros:['Serverless for MVP','Global distribution','Agent Memory Toolkit integration'],
+ cons:['RU modeling needed at scale'],bestFor:'Agent Memory: onboarding bot state (UC-01), RFP agent context (UC-04)'},
+
+// ── PILLAR 3 ──────────────────────────────────────
+{id:'entrap1',pillar:'p3',name:'Entra ID P1',cat:'Identity',icon:'🔑',tier:'standard',isNew:false,
+ price:'$6/user/mo (included in M365 E3)',
+ desc:'Conditional Access, MFA, SSO for all internal users. Foundation of Zero Trust for WMS/WMP.',
+ waf:{cost:4,rel:5,sec:5,ops:5,perf:5},tags:['identity','Zero Trust','MFA'],
+ uc:['uc01','uc02','uc03','uc04','uc05','uc06','uc07'],
+ pros:['Conditional Access','Included in M365 E3','SSPR self-service'],
+ cons:['PIM needs P2'],bestFor:'All internal WMS/WMP users — baseline identity'},
+
+{id:'entrap2',pillar:'p3',name:'Entra ID P2',cat:'Identity',icon:'🔑',tier:'premium',isNew:false,
+ price:'$9/user/mo (P1 + $3)',
+ desc:'Adds PIM and Identity Protection for admin/compliance roles. Just-in-time access to production OneLake.',
+ waf:{cost:3,rel:5,sec:5,ops:5,perf:5},tags:['identity','PIM','Zero Trust'],
+ uc:[],
+ pros:['PIM just-in-time admin access','Identity Protection risk scoring'],
+ cons:['Limit to privileged roles only'],bestFor:'Admin and compliance manager roles — apply selectively'},
+
+{id:'extid',pillar:'p3',name:'Entra External ID',cat:'Identity',icon:'🌍',tier:'budget',isNew:false,
+ price:'Free <50K MAU · $0.01650/MAU above',
+ desc:'B2B/B2C identity for external suppliers. Replaces $0.80/login Power Pages model at scale.',
+ waf:{cost:5,rel:5,sec:5,ops:5,perf:5},tags:['identity','B2B','suppliers','free tier'],
+ uc:['uc01','uc02'],
+ pros:['Free up to 50K MAU','MFA + self-service','Works with Rayfin Entra auth'],
+ cons:['Custom UI needs styling','B2C policy configuration'],bestFor:'Supplier self-service portal login at scale'},
+
+{id:'mid',pillar:'p3',name:'Managed Identities',cat:'Identity',icon:'🤖',tier:'free',isNew:false,
+ price:'Free',
+ desc:'Azure-managed service identity. Eliminates secrets — Container Apps, Functions, Fabric Data Agents authenticate without credentials.',
+ waf:{cost:5,rel:5,sec:5,ops:5,perf:5},tags:['identity','Zero Trust','free','secrets'],
+ uc:['uc01','uc02','uc03','uc04','uc05','uc06','uc07'],
+ pros:['No secrets in code','Free','Works with all Azure + Fabric Data Agents'],
+ cons:['Azure resources only — no on-prem'],bestFor:'All backend services — mandatory Zero Trust pattern'},
+
+{id:'ca',pillar:'p3',name:'Azure Container Apps',cat:'Compute',icon:'📦',tier:'budget',isNew:false,
+ price:'Free 180K vCPU-s/mo · $0.000024/vCPU-s above',
+ desc:'Serverless containers for WMS/WMP FastAPI microservices. Scale-to-zero when idle.',
+ waf:{cost:4,rel:4,sec:4,ops:5,perf:4},tags:['compute','serverless','Python','FastAPI'],
+ uc:['uc01','uc02','uc04','uc05','uc06','uc07'],
+ pros:['Scale-to-zero','Dapr service mesh','Internal ingress'],
+ cons:['Cold start on scale-to-zero'],bestFor:'All FastAPI services — ModelRouter, RAG retrieval, eligibility engine'},
+
+{id:'funcs',pillar:'p3',name:'Azure Functions',cat:'Compute',icon:'⚡',tier:'free',isNew:false,
+ price:'1M free executions/mo · $0.20/1M above',
+ desc:'Event-driven for background tasks: index triggers, cert expiry, Eventstream consumers, Agent Memory Durable Functions.',
+ waf:{cost:5,rel:4,sec:4,ops:5,perf:4},tags:['compute','serverless','event-driven','free'],
+ uc:['uc01','uc03','uc05','uc07'],
+ pros:['1M free/mo','Durable Functions for Agent Memory','Eventstream integration'],
+ cons:['Not for long-running tasks'],bestFor:'Agent Memory Toolkit, cert expiry cron, Eventstream consumers'},
+
+{id:'kv',pillar:'p3',name:'Azure Key Vault',cat:'Security',icon:'🔒',tier:'free',isNew:false,
+ price:'10K ops/mo free · $0.03/10K above',
+ desc:'Centralized secret, key, certificate management. All API keys and connection strings stored here — never in code.',
+ waf:{cost:5,rel:5,sec:5,ops:5,perf:5},tags:['security','Zero Trust','secrets','free'],
+ uc:[],
+ pros:['HSM-backed keys','Managed Identity access','Audit log of all access'],
+ cons:['Cache locally for high-frequency reads'],bestFor:'All services — mandatory for Zero Trust posture'},
+
+{id:'appi',pillar:'p3',name:'App Insights + Log Analytics',cat:'Observability',icon:'📡',tier:'budget',isNew:false,
+ price:'First 5GB/day free · $2.76/GB above',
+ desc:'APM for all WMS/WMP services. Distributed tracing, exception tracking. Cost dashboard for Azure OpenAI token usage.',
+ waf:{cost:4,rel:5,sec:4,ops:5,perf:5},tags:['observability','monitoring','APM'],
+ uc:['uc01','uc02','uc03','uc04','uc05','uc06','uc07'],
+ pros:['5GB/day free generous for MVP','Distributed tracing','Power BI cost dashboard'],
+ cons:['$2.76/GB grows — set data caps'],bestFor:'All services — mandatory. Cost tracking Power BI on Log Analytics.'},
+
+{id:'sentinel',pillar:'p3',name:'Microsoft Sentinel',cat:'Security',icon:'🛡️',tier:'premium',isNew:false,
+ price:'$2.46/GB ingested · Commitment $123/day = 50GB',
+ desc:'Cloud-native SIEM. Threat detection, compliance incident management, EU AI Act audit log correlation.',
+ waf:{cost:2,rel:5,sec:5,ops:4,perf:4},tags:['security','SIEM','Zero Trust','compliance'],
+ uc:[],
+ pros:['Azure + M365 native connectors','AI threat detection','EU AI Act audit correlation'],
+ cons:['Expensive at scale — filter logs carefully'],bestFor:'Scale-out security ops — defer to Pilot/Scale for cost control'},
+
+{id:'defender',pillar:'p3',name:'Defender for Cloud',cat:'Security',icon:'🛡️',tier:'standard',isNew:false,
+ price:'$15/server/mo · CSPM $0.007/resource/day',
+ desc:'CSPM and workload protection. Regulatory compliance dashboard (ISO 27001, GDPR, EU AI Act).',
+ waf:{cost:3,rel:5,sec:5,ops:5,perf:4},tags:['security','CSPM','compliance','Zero Trust'],
+ uc:[],
+ pros:['Compliance dashboard built-in','Secure Score','Defender for Containers'],
+ cons:['DCSPM per-resource cost'],bestFor:'Enable on MVP — regulatory compliance dashboard essential for WMS/WMP'},
+
+{id:'devops',pillar:'p3',name:'Azure DevOps',cat:'DevOps',icon:'🔧',tier:'free',isNew:false,
+ price:'Free for 5 users · $6/user/mo above',
+ desc:'CI/CD for WMS/WMP — Container Apps, Fabric Dataflows, Rayfin services. Boards for AI use case backlog.',
+ waf:{cost:4,rel:5,sec:4,ops:5,perf:4},tags:['DevOps','CI/CD','pipelines','free'],
+ uc:[],
+ pros:['Free for small teams','Container Apps integration','YAML for Fabric workspaces'],
+ cons:['Large teams may prefer GitHub Actions'],bestFor:'CI/CD for all WMS/WMP services — MVP/Pilot/Scale gating'},
+
+{id:'ghent',pillar:'p3',name:'GitHub Enterprise',cat:'DevOps',icon:'🐙',tier:'premium',isNew:false,
+ price:'$21/user/mo',
+ desc:'Enterprise GitHub with Advanced Security. Rayfin is GitHub-native — CI/CD for Rayfin services lives here.',
+ waf:{cost:3,rel:5,sec:5,ops:5,perf:5},tags:['DevOps','security','Rayfin','Advanced Security'],
+ uc:[],
+ pros:['Rayfin CI/CD is GitHub-native','Secret scanning + code scanning'],
+ cons:['$21/user — evaluate vs Azure DevOps'],bestFor:'Rayfin backend development — required for GitHub-native Rayfin deployment'},
+
+{id:'m365e3',pillar:'p3',name:'M365 E3',cat:'Productivity',icon:'📧',tier:'premium',isNew:false,
+ price:'$36/user/mo',
+ desc:'Teams, SharePoint, Entra P1, Exchange. Teams is the UI surface for Copilot Studio agents and Power BI dashboards.',
+ waf:{cost:3,rel:5,sec:4,ops:5,perf:4},tags:['M365','Teams','SharePoint','productivity'],
+ uc:[],
+ pros:['Includes Entra P1','Teams as AI agent UI','SharePoint doc library'],
+ cons:['$36/user significant at scale','Copilot add-on extra'],bestFor:'All internal users — baseline productivity + identity + Teams'}
+];
+
+const DECISIONS = [
+ {need:'Deploy API backend with OneLake storage instantly',prods:['Rayfin'],cost:'Fabric F-SKU',note:'npx rayfin up — TypeScript GraphQL+REST Entra auth zero ETL'},
+ {need:'Classify documents in bulk without per-record LLM calls',prods:['Fabric DW (GPU)'],cost:'F16+ Fabric',note:'T-SQL AI functions — entity extraction + classification at DW scale'},
+ {need:'Build conversational compliance knowledge agent',prods:['Copilot Studio','AI Search S1','AI Foundry'],cost:'$250–450/mo',note:'RAG: AI Search + GPT-4o + Copilot Studio frontend (UC-06)'},
+ {need:'Extract fields from invoices and permits automatically',prods:['AI Document Intelligence','GPT-4o-mini'],cost:'$1.50–30/1K pages',note:'Prebuilt invoice models; GPT-4o fallback for complex permits (UC-05)'},
+ {need:'Query Power BI dashboards in natural language via Teams',prods:['Fabric IQ','Copilot Studio'],cost:'$30/user Copilot add-on',note:'Fabric IQ over ESG + anomaly semantic models (UC-03, UC-07)'},
+ {need:'Replicate operational DB to OneLake without building ETL',prods:['OneLake Mirroring'],cost:'Included in Fabric',note:'Azure SQL SharePoint Lists SQL Server 2016+ — Workspace Private Link'},
+ {need:'Trigger real-time alerts on database row changes',prods:['Eventstreams','Change Feeds'],cost:'Fabric streaming CUs',note:'Mirrored DB → Change Feed → Eventstream → Power Automate'},
+ {need:'Authenticate AI agent service calls without credentials',prods:['Managed Identities','Fabric Data Agents'],cost:'Free',note:'Service principal auth on Fabric Data Agents (Build 2026)'},
+ {need:'Generate ESG narrative reports from evidence data',prods:['GPT-4o','Fabric DW (GPU)'],cost:'$2.50/1M tokens',note:'T-SQL entity extraction first GPT-4o for narrative only (UC-03)'},
+ {need:'Persist multi-turn agent conversation across sessions',prods:['Cosmos DB','Azure Functions'],cost:'Serverless ~€10–50/mo',note:'Agent Memory Toolkit: Cosmos DB + Durable Functions + Foundry'},
+ {need:'Provide supplier self-service portal login at scale',prods:['Entra External ID'],cost:'Free <50K MAU',note:'Replaces $0.80/login Power Pages — B2B/B2C Entra auth'},
+ {need:'Run document approval workflows on state changes',prods:['Power Automate Premium','Eventstreams'],cost:'$15/user/mo',note:'Eventstream → Power Automate trigger → approval flow (UC-01 UC-05)'},
+ {need:'Analyse multi-section RFPs across sessions',prods:['GPT-4.1','AI Document Intelligence','Cosmos DB'],cost:'~$2/1M tokens',note:'Agent Memory Toolkit for large multi-section RFP continuity (UC-04)'},
+ {need:'Score and explain supplier eligibility for waste contracts',prods:['GPT-4o-mini','AI Foundry'],cost:'$0.15/1M tokens',note:'Deterministic filters first AI for explanation only (UC-02)'},
+ {need:'Route LLM calls to cheapest capable model automatically',prods:['GPT-4.1-nano','GPT-4o-mini','GPT-4o'],cost:'$0.07–10/1M tokens',note:'ModelRouter: classify→nano extract simple→mini complex→GPT-4o'},
+ {need:'Monitor all AI service costs and token usage',prods:['App Insights + Log Analytics'],cost:'5GB/day free',note:'Log Analytics + Power BI cost dashboard + budget alerts'},
+ {need:'Store all secrets and connection strings securely',prods:['Azure Key Vault'],cost:'~Free at MVP scale',note:'Managed Identity access — no secrets in code or config files'},
+ {need:'Build Power BI dashboards on live OneLake data',prods:['Power BI Pro','OneLake'],cost:'$10/user/mo',note:'DirectLake — no import refresh instant updates from OneLake Delta'},
+ {need:'Protect Azure resources with compliance posture',prods:['Defender for Cloud'],cost:'$15/server + $0.007/resource/day',note:'CSPM ISO 27001 GDPR EU AI Act compliance dashboard'},
+ {need:'Access live OneLake data in AI agent turns',prods:['OneLake MCP','Fabric Data Agents'],cost:'Included in Fabric',note:'GA April 2026 — MCP protocol Entra identity agents read OneLake live'},
+ {need:'Build internal operator portal rapidly',prods:['Power Apps Premium'],cost:'$20/user/mo',note:'Dataverse-native rapid development mobile responsive (UC-01 UC-02)'},
+ {need:'Apply data governance and sensitivity labels',prods:['Microsoft Purview'],cost:'$0.496/CU·hr Data Map',note:'Sensitivity labels flow from M365 into OneLake and SharePoint'},
+ {need:'Enable just-in-time access for admin roles',prods:['Entra ID P2'],cost:'$9/user/mo admin roles only',note:'PIM time-limited access to Fabric and production OneLake'},
+ {need:'Run CI/CD for Container Apps and Fabric',prods:['Azure DevOps','GitHub Enterprise'],cost:'Free–$21/user',note:'Azure DevOps for Container Apps; GitHub Actions for Rayfin (GitHub-native)'},
+ {need:'Evaluate AI output quality with golden QA datasets',prods:['Azure AI Foundry'],cost:'Included in Foundry',note:'Groundedness scoring weekly evaluation pipeline datasets per UC'},
+ {need:'Index and search compliance docs with metadata filters',prods:['Azure AI Search S1'],cost:'$250/mo S1',note:'Hybrid search keyword+semantic+vector country/doc_type/lifecycle filters'}
+];
+
+const SCENARIOS = {
+ mvp:{title:'MVP (~10 Suppliers · 1 Country)',desc:'2 developers · 10 pilot suppliers · All 7 use cases basic form',total:'€995–1,150',
+  sections:[
+   {name:'AI & Apps',rows:[
+    {item:'Azure OpenAI (nano+mini+4o)',unit:'MVP token volume',cost:'~€80'},
+    {item:'AI Document Intelligence',unit:'~2,000 pages/mo',cost:'~€30'},
+    {item:'Copilot Studio (1 agent)',unit:'$200/tenant/mo',cost:'~€185'},
+    {item:'Power Automate Premium',unit:'2 users',cost:'~€28'},
+    {item:'Rayfin',unit:'Included in Fabric (preview)',cost:'€0'},
+    {item:'GitHub Copilot Business',unit:'2 developers',cost:'~€35'},
+   ],sub:'~€358'},
+   {name:'Data',rows:[
+    {item:'Microsoft Fabric F8 (1-yr Reserved)',unit:'West Europe',cost:'~€139'},
+    {item:'OneLake storage',unit:'~500 GB cool tier',cost:'~€3'},
+    {item:'Azure AI Search S1',unit:'1 replica',cost:'~€230'},
+    {item:'Azure Cosmos DB',unit:'Serverless · Agent Memory',cost:'~€10'},
+   ],sub:'~€382'},
+   {name:'Infrastructure',rows:[
+    {item:'M365 E3 (includes Entra P1)',unit:'5 internal users',cost:'~€165'},
+    {item:'Entra External ID',unit:'<50K MAU',cost:'€0'},
+    {item:'Container Apps',unit:'Low volume — free tier',cost:'~€10'},
+    {item:'App Insights + Log Analytics',unit:'<5GB/day',cost:'€0'},
+    {item:'Defender for Cloud (CSPM)',unit:'~10 resources',cost:'~€45'},
+   ],sub:'~€220'},
+  ],note:'AI Search S1 dominates MVP cost. Consider Basic ($75/mo) if knowledge corpus <2GB.'},
+ pilot:{title:'Pilot (~100 Suppliers · 2–3 Countries)',desc:'5 developers · 15 internal users · 100 suppliers',total:'€2,400–2,800',
+  sections:[
+   {name:'AI & Apps',rows:[
+    {item:'Azure OpenAI (full model tier)',unit:'10× MVP volume',cost:'~€400'},
+    {item:'AI Document Intelligence',unit:'~20,000 pages/mo',cost:'~€200'},
+    {item:'Copilot Studio (3 agents)',unit:'$200 + message credits',cost:'~€250'},
+    {item:'Power Automate Premium',unit:'10 users',cost:'~€138'},
+    {item:'GitHub Copilot Business',unit:'5 developers',cost:'~€88'},
+    {item:'Power Apps Premium',unit:'15 internal users',cost:'~€277'},
+   ],sub:'~€1,353'},
+   {name:'Data',rows:[
+    {item:'Fabric F16 (1-yr Reserved)',unit:'West Europe',cost:'~€281'},
+    {item:'OneLake storage',unit:'~5 TB mixed tiers',cost:'~€35'},
+    {item:'Azure AI Search S1',unit:'2 replicas',cost:'~€460'},
+    {item:'Cosmos DB',unit:'Provisioned · Agent Memory',cost:'~€60'},
+    {item:'Power BI Pro',unit:'15 users',cost:'~€139'},
+   ],sub:'~€975'},
+   {name:'Infrastructure',rows:[
+    {item:'M365 E3',unit:'15 internal users',cost:'~€497'},
+    {item:'Entra External ID',unit:'<50K MAU',cost:'€0'},
+    {item:'Container Apps',unit:'Production workload',cost:'~€80'},
+    {item:'App Insights + Log Analytics',unit:'~20GB/day',cost:'~€150'},
+    {item:'Defender for Cloud',unit:'~50 resources',cost:'~€85'},
+   ],sub:'~€827'},
+  ],note:'Upgrade AI Search S2 if corpus >50GB across 3 countries. PTU for GPT-4o if >10M tokens/month.'},
+ scale:{title:'Scale-out (~1,000 Suppliers · 10+ Countries)',desc:'15+ developers · 100 internal users · 1,000+ suppliers',total:'€5,500–7,500',
+  sections:[
+   {name:'AI & Apps',rows:[
+    {item:'Azure OpenAI PTU (GPT-4o sustained)',unit:'1 PTU unit',cost:'~€2,268'},
+    {item:'Azure OpenAI PAYG (nano/mini)',unit:'High volume classification',cost:'~€300'},
+    {item:'AI Document Intelligence',unit:'~200K pages/mo',cost:'~€1,200'},
+    {item:'Copilot Studio (10 agents)',unit:'$200 + high volume',cost:'~€500'},
+    {item:'Power Automate + AI Builder',unit:'30 users',cost:'~€870'},
+    {item:'GitHub Copilot Business',unit:'15 developers',cost:'~€263'},
+    {item:'Power Apps Premium',unit:'100 internal users',cost:'~€1,847'},
+   ],sub:'~€7,248'},
+   {name:'Data',rows:[
+    {item:'Fabric F64 (1-yr Reserved)',unit:'West Europe',cost:'~€1,125'},
+    {item:'OneLake storage',unit:'~50 TB mixed tiers',cost:'~€225'},
+    {item:'Azure AI Search S2',unit:'3 replicas + 12 partitions',cost:'~€740'},
+    {item:'Cosmos DB',unit:'Provisioned high-throughput',cost:'~€300'},
+    {item:'Power BI Premium Per User',unit:'100 users',cost:'~€1,847'},
+    {item:'Microsoft Purview',unit:'Data Map',cost:'~€200'},
+   ],sub:'~€4,437'},
+   {name:'Infrastructure',rows:[
+    {item:'M365 E3',unit:'100 internal users',cost:'~€3,311'},
+    {item:'Entra External ID',unit:'~100K MAU suppliers',cost:'~€825'},
+    {item:'Container Apps',unit:'High-volume production',cost:'~€400'},
+    {item:'App Insights + Log Analytics',unit:'Commitment 100GB/day',cost:'~€600'},
+    {item:'Microsoft Sentinel',unit:'50GB/day commitment',cost:'~€3,690'},
+    {item:'Defender for Cloud',unit:'~200 resources',cost:'~€340'},
+   ],sub:'~€9,166'},
+  ],note:'Sentinel ($3,690/mo) is largest infra expense — filter logs carefully. PTU saves ~40% vs PAYG at this volume.'}
+};
+
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+let filt = {pillar:'',tier:'',uc:'',waf:'',search:'',newOnly:false};
+let expanded = new Set();
+let compareSet = new Set();
+
+// ═══════════════════════════════════════════════════
+// PRODUCTS RENDER
+// ═══════════════════════════════════════════════════
+function filtered(){
+ return PRODS.filter(p=>{
+  if(filt.pillar && p.pillar!==filt.pillar) return false;
+  if(filt.tier && p.tier!==filt.tier) return false;
+  if(filt.uc && !p.uc.includes(filt.uc)) return false;
+  if(filt.newOnly && !p.isNew) return false;
+  if(filt.waf==='cost' && p.waf.cost<4) return false;
+  if(filt.waf==='sec' && p.waf.sec<4) return false;
+  if(filt.waf==='rel' && p.waf.rel<4) return false;
+  if(filt.search){const q=filt.search.toLowerCase();if(!p.name.toLowerCase().includes(q)&&!p.desc.toLowerCase().includes(q)&&!p.cat.toLowerCase().includes(q)&&!p.tags.join(' ').toLowerCase().includes(q)) return false;}
+  return true;
+ });
+}
+
+function renderProducts(){
+ const list=filtered();
+ const grid=document.getElementById('pgrid');
+ document.getElementById('grid-count').textContent=`Showing ${list.length} of ${PRODS.length} products`;
+ grid.innerHTML='';
+ const pillarOrder=['p1','p2','p3'];
+ const pillarDesc={p1:'Language models, agent platforms, document AI, productivity tools',p2:'Fabric, OneLake, analytics, search, governance',p3:'Identity, compute, security, DevOps, observability'};
+ const pillarName={p1:'Pillar 1 — AI & Apps',p2:'Pillar 2 — Data',p3:'Pillar 3 — Infrastructure'};
+ const grouped={p1:[],p2:[],p3:[]};
+ list.forEach(p=>grouped[p.pillar].push(p));
+ pillarOrder.forEach(pil=>{
+  const grp=grouped[pil];
+  if(!grp.length) return;
+  const hdr=document.createElement('div');
+  hdr.className=`ph ${pil}`;
+  hdr.style.gridColumn='1/-1';
+  hdr.innerHTML=`<div><h3 style="color:${PC[pil]}">${pillarName[pil]}</h3><p>${pillarDesc[pil]}</p></div><span class="ph-count" style="color:${PC[pil]}">${grp.length} products</span>`;
+  grid.appendChild(hdr);
+  grp.forEach(p=>{
+   const card=document.createElement('div');
+   card.className=`card ${p.pillar}${expanded.has(p.id)?' expanded':''}${compareSet.has(p.id)?' in-compare':''}`;
+   card.setAttribute('data-id',p.id);
+   const tierLabel={free:'Free / Included',budget:'Budget',standard:'Standard',premium:'Premium',variable:'Variable'}[p.tier];
+   const tierClass='t-'+p.tier;
+   const wafHTML=['cost','rel','sec','ops','perf'].map(k=>`<div class="waf-item"><div class="waf-dots">${[1,2,3,4,5].map(i=>`<div class="waf-dot${p.waf[k]>=i?' on':''}"></div>`).join('')}</div><div class="waf-label">${k}</div></div>`).join('');
+   card.innerHTML=`
+    <div class="card-top">
+     <div class="card-icon" style="background:${PC[p.pillar]}15">${p.icon}</div>
+     <div><div class="card-name">${p.name}</div><div class="card-cat">${p.cat}</div></div>
+    </div>
+    <div class="card-badges">
+     <span class="tier-badge ${tierClass}">${tierLabel}</span>
+     ${p.isNew?'<span class="badge-new">⭐ Build 2026</span>':''}
+    </div>
+    <div class="card-price"><strong>${p.price}</strong></div>
+    <div class="card-desc">${p.desc}</div>
+    <div class="waf-row">${wafHTML}</div>
+    <div class="card-tags">${p.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    <button class="card-cmp-btn" onclick="toggleCompare(event,'${p.id}')">${compareSet.has(p.id)?'✓ Comparing':'+ Compare'}</button>
+    <div class="card-arrow">▼</div>
+    <div class="detail">
+     <div class="dg">
+      <div class="ds"><h4>Strengths</h4><ul>${(p.pros||[]).map(x=>`<li>${x}</li>`).join('')}</ul></div>
+      <div class="ds"><h4>Considerations</h4><ul>${(p.cons||[]).map(x=>`<li>${x}</li>`).join('')}</ul></div>
+     </div>
+     ${p.bestFor?`<div class="ds" style="margin-top:8px"><h4>Best for in WMS/WMP</h4><p style="font-size:11px">${p.bestFor}</p></div>`:''}
+     ${p.uc.length?`<div style="margin-top:8px">${p.uc.map(u=>`<span class="tag">${u.toUpperCase().replace('UC0','UC-').replace('uc0','UC-')}</span>`).join(' ')}</div>`:''}
+    </div>`;
+   card.addEventListener('click',e=>{if(!e.target.classList.contains('card-cmp-btn'))toggleExpand(p.id,card);});
+   grid.appendChild(card);
+  });
+ });
+ updateSbCounts(list);
+}
+
+function toggleExpand(id,card){
+ if(expanded.has(id)){expanded.delete(id);card.classList.remove('expanded');}
+ else{expanded.add(id);card.classList.add('expanded');}
+}
+
+function updateSbCounts(list){
+ document.getElementById('cnt-all').textContent=list.length;
+ document.getElementById('cnt-p1').textContent=list.filter(p=>p.pillar==='p1').length;
+ document.getElementById('cnt-p2').textContent=list.filter(p=>p.pillar==='p2').length;
+ document.getElementById('cnt-p3').textContent=list.filter(p=>p.pillar==='p3').length;
+}
+
+// ═══════════════════════════════════════════════════
+// FILTERS
+// ═══════════════════════════════════════════════════
+function applyFilters(){
+ filt.pillar=document.getElementById('f-pillar').value;
+ filt.tier=document.getElementById('f-tier').value;
+ filt.uc=document.getElementById('f-uc').value;
+ filt.waf=document.getElementById('f-waf').value;
+ filt.search=document.getElementById('s-input').value.trim();
+ renderProducts(); renderChips();
+}
+function sbPillar(val,btn){document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));btn.classList.add('active');filt.pillar=val;document.getElementById('f-pillar').value=val;filt.newOnly=false;renderProducts();renderChips();}
+function sbTier(val,btn){document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));btn.classList.add('active');filt.tier=val;document.getElementById('f-tier').value=val;filt.newOnly=false;renderProducts();renderChips();}
+function sbNew(btn){document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));btn.classList.add('active');filt.newOnly=true;filt.pillar='';filt.tier='';document.getElementById('f-pillar').value='';document.getElementById('f-tier').value='';renderProducts();renderChips();}
+function resetFilters(){filt={pillar:'',tier:'',uc:'',waf:'',search:'',newOnly:false};document.getElementById('f-pillar').value='';document.getElementById('f-tier').value='';document.getElementById('f-uc').value='';document.getElementById('f-waf').value='';document.getElementById('s-input').value='';document.querySelectorAll('.sb-item').forEach((b,i)=>b.classList.toggle('active',i===0));renderProducts();renderChips();}
+
+function renderChips(){
+ const bar=document.getElementById('chips-bar');
+ const empty=document.getElementById('chips-empty');
+ const lm={pillar:{p1:'AI & Apps',p2:'Data',p3:'Infrastructure'},tier:{free:'Free',budget:'Budget',standard:'Standard',premium:'Premium',variable:'Variable'},uc:{uc01:'UC-01',uc02:'UC-02',uc03:'UC-03',uc04:'UC-04',uc05:'UC-05',uc06:'UC-06',uc07:'UC-07'},waf:{cost:'Cost Optimized',sec:'Highly Secure',rel:'Highly Reliable'}};
+ const chips=[];
+ if(filt.pillar) chips.push({l:'Pillar: '+lm.pillar[filt.pillar],k:'pillar'});
+ if(filt.tier) chips.push({l:'Tier: '+lm.tier[filt.tier],k:'tier'});
+ if(filt.uc) chips.push({l:'Use Case: '+lm.uc[filt.uc],k:'uc'});
+ if(filt.waf) chips.push({l:'WAF: '+lm.waf[filt.waf],k:'waf'});
+ if(filt.search) chips.push({l:'Search: "'+filt.search+'"',k:'search'});
+ if(filt.newOnly) chips.push({l:'Build 2026 New',k:'newOnly'});
+ const cnt=filtered().length;
+ bar.querySelectorAll('.chip').forEach(c=>c.remove());
+ bar.querySelectorAll('span:not(.chips-empty)').forEach(c=>c.remove());
+ if(!chips.length){empty.textContent=`Showing all ${cnt} products — click any card to expand`;empty.style.display='';}
+ else{
+  empty.style.display='none';
+  chips.forEach(ch=>{const c=document.createElement('span');c.className='chip';c.innerHTML=ch.l+` <span class="chip-x" onclick="rmChip('${ch.k}')">✕</span>`;bar.appendChild(c);});
+  const cs=document.createElement('span');cs.style.cssText='font-size:11px;color:var(--muted);margin-left:4px';cs.textContent=`${cnt} result${cnt!==1?'s':''}`;bar.appendChild(cs);
+ }
+}
+function rmChip(k){if(k==='search'){filt.search='';document.getElementById('s-input').value='';}else if(k==='newOnly'){filt.newOnly=false;}else{filt[k]='';const el=document.getElementById('f-'+k);if(el) el.value='';}renderProducts();renderChips();}
+
+// ═══════════════════════════════════════════════════
+// COMPARE
+// ═══════════════════════════════════════════════════
+function toggleCompare(e,id){
+ e.stopPropagation();
+ if(compareSet.has(id)){compareSet.delete(id);}
+ else{if(compareSet.size>=3) return;compareSet.add(id);}
+ renderProducts();updateCompareTray();
+}
+function updateCompareTray(){
+ const tray=document.getElementById('cmp-tray');
+ const items=[...compareSet];
+ const tab=document.getElementById('cmp-count-tab');
+ tab.textContent=items.length?`(${items.length})`:'';
+ tray.classList.toggle('visible',items.length>0);
+ [0,1,2].forEach(i=>{
+  const slot=document.getElementById('cmp-s'+i);
+  const p=items[i]?PRODS.find(x=>x.id===items[i]):null;
+  if(p){slot.className='cmp-slot filled';slot.innerHTML=`${p.icon} ${p.name}<span class="cmp-slot-x" onclick="toggleCompare(event,'${p.id}')">✕</span>`;}
+  else{slot.className='cmp-slot';slot.innerHTML='+ Select a product';}
+ });
+}
+function clearCompare(){compareSet.clear();renderProducts();updateCompareTray();}
+function showCompare(){
+ switchTab('compare',document.querySelectorAll('.tab')[1]);
+ const items=[...compareSet].map(id=>PRODS.find(p=>p.id===id)).filter(Boolean);
+ const content=document.getElementById('cmp-content');
+ if(!items.length){content.innerHTML='<p style="color:var(--muted);font-size:12px">No products selected.</p>';return;}
+ const wafKeys=['cost','rel','sec','ops','perf'];
+ const wafLabel={cost:'Cost Optimization',rel:'Reliability',sec:'Security',ops:'Operational Excellence',perf:'Performance'};
+ let html=`<table class="cmp-table"><thead><tr><th>Criterion</th>${items.map(p=>`<th style="color:${PC[p.pillar]}">${p.icon} ${p.name}</th>`).join('')}</tr></thead><tbody>`;
+ html+=`<tr class="row-hdr"><td colspan="${items.length+1}">Basic Info</td></tr>`;
+ html+=`<tr><td>Pillar</td>${items.map(p=>`<td>${PL[p.pillar]}</td>`).join('')}</tr>`;
+ html+=`<tr><td>Category</td>${items.map(p=>`<td>${p.cat}</td>`).join('')}</tr>`;
+ html+=`<tr><td>Cost Tier</td>${items.map(p=>`<td><span class="tier-badge t-${p.tier}">${p.tier}</span></td>`).join('')}</tr>`;
+ html+=`<tr><td>Price</td>${items.map(p=>`<td style="font-size:11px">${p.price}</td>`).join('')}</tr>`;
+ html+=`<tr><td>Build 2026</td>${items.map(p=>`<td>${p.isNew?'⭐ Yes':'—'}</td>`).join('')}</tr>`;
+ html+=`<tr class="row-hdr"><td colspan="${items.length+1}">WAF Scores</td></tr>`;
+ wafKeys.forEach(k=>{
+  html+=`<tr><td>${wafLabel[k]}</td>${items.map(p=>`<td><span class="waf-bar" style="width:${p.waf[k]*20}%;background:${PC[p.pillar]}"></span> ${p.waf[k]}/5</td>`).join('')}</tr>`;
+ });
+ html+=`<tr class="row-hdr"><td colspan="${items.length+1}">WMS/WMP</td></tr>`;
+ html+=`<tr><td>Use Cases</td>${items.map(p=>`<td style="font-size:11px">${p.uc.join(', ')||'—'}</td>`).join('')}</tr>`;
+ html+=`<tr><td>Best for</td>${items.map(p=>`<td style="font-size:11px">${p.bestFor||'—'}</td>`).join('')}</tr>`;
+ html+=`</tbody></table>`;
+ content.innerHTML=html;
+}
+
+// ═══════════════════════════════════════════════════
+// DECISION GUIDE
+// ═══════════════════════════════════════════════════
+function renderDecision(){
+ const body=document.getElementById('dtbody');
+ body.innerHTML=DECISIONS.map(d=>{
+  const prods=d.prods.map(pr=>{const p=PRODS.find(x=>x.name.includes(pr.split(' ')[0]));const c=p?PC[p.pillar]:'#64748B';return `<span class="dprod" style="background:${c}18;color:${c};border:1px solid ${c}30">${pr}</span>`;}).join('');
+  return `<tr><td style="font-weight:500">${d.need}</td><td>${prods}</td><td style="color:var(--muted);font-size:11px">${d.cost}</td><td style="color:var(--muted);font-size:11px">${d.note}</td></tr>`;
+ }).join('');
+}
+function filterDecision(q){document.querySelectorAll('#dtbody tr').forEach(r=>{r.style.display=(!q||r.textContent.toLowerCase().includes(q.toLowerCase()))?'':'none';});}
+
+// ═══════════════════════════════════════════════════
+// COST SCENARIOS
+// ═══════════════════════════════════════════════════
+function renderScenarios(){
+ ['mvp','pilot','scale'].forEach(key=>{
+  const s=SCENARIOS[key];
+  const el=document.getElementById('scen-'+key);
+  let h=`<div class="shdr"><div><h3>${s.title}</h3><p>${s.desc}</p></div><div class="shdr-tot"><div class="shdr-amt">${s.total}</div><div class="shdr-lbl">/month estimated</div></div></div>`;
+  h+=`<table class="ctable"><thead><tr><th>Item</th><th>Unit / Scale</th><th>Est. Monthly Cost</th></tr></thead><tbody>`;
+  s.sections.forEach(sec=>{
+   h+=`<tr class="sec-row"><td colspan="3">${sec.name}</td></tr>`;
+   sec.rows.forEach(r=>h+=`<tr><td>${r.item}</td><td style="color:var(--muted)">${r.unit||''}</td><td style="font-weight:600">${r.cost}</td></tr>`);
+   if(sec.sub) h+=`<tr class="sub-row"><td colspan="2">Subtotal</td><td>${sec.sub}</td></tr>`;
+  });
+  h+=`<tr class="tot-row"><td colspan="2">TOTAL ESTIMATED (EUR)</td><td>${s.total}/mo</td></tr>`;
+  h+=`</tbody></table><p class="cnote">💡 ${s.note}</p>`;
+  el.innerHTML=h;
+ });
+}
+function switchScen(key,btn){document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.spanel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');document.getElementById('scen-'+key).classList.add('active');}
+
+// ═══════════════════════════════════════════════════
+// ARCHITECTURE DIAGRAM — CANVAS
+// ═══════════════════════════════════════════════════
+const PILLAR_PRODUCTS = {
+ p1: PRODS.filter(p=>p.pillar==='p1'),
+ p2: PRODS.filter(p=>p.pillar==='p2'),
+ p3: PRODS.filter(p=>p.pillar==='p3')
+};
+
+function drawDiagram(){
+ const canvas=document.getElementById('arch-canvas');
+ const view=document.getElementById('arch-view').value;
+ const W=1400, H=900;
+ const DPR=2;
+ canvas.width=W*DPR; canvas.height=H*DPR;
+ canvas.style.width=W+'px'; canvas.style.height=H+'px';
+ const ctx=canvas.getContext('2d');
+ ctx.scale(DPR,DPR);
+ if(view==='pillars') drawPillars(ctx,W,H);
+ else drawLayers(ctx,W,H);
+}
+
+function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill();}
+
+function drawPillars(ctx,W,H){
+ // Background
+ const bg=ctx.createLinearGradient(0,0,0,H);
+ bg.addColorStop(0,'#0B1E3F'); bg.addColorStop(1,'#0F172A');
+ ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+ // Subtle grid
+ ctx.strokeStyle='rgba(255,255,255,0.03)'; ctx.lineWidth=1;
+ for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+ for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+ // Title
+ ctx.fillStyle='#F1F5F9'; ctx.font='bold 22px Segoe UI, system-ui, sans-serif';
+ ctx.fillText('Microsoft Azure Architecture — WMS/WMP 2026',50,46);
+ ctx.fillStyle='#60A5FA'; ctx.font='12px Segoe UI, system-ui, sans-serif';
+ ctx.fillText('Build 2026 + Rayfin Preview · Azure AI Foundry · Fabric Backbone',50,68);
+
+ const pillarDefs=[
+  {key:'p1',color:'#0078D4',label:'Pillar 1 — AI & Apps',emoji:'🤖'},
+  {key:'p2',color:'#7C3AED',label:'Pillar 2 — Data',emoji:'🔷'},
+  {key:'p3',color:'#059669',label:'Pillar 3 — Infrastructure',emoji:'🔒'},
+ ];
+ const pad=20, colW=(W-pad*2-pad*2)/3, startY=90, colH=H-startY-70;
+ const onelakeY=H-60;
+
+ pillarDefs.forEach((pil,ci)=>{
+  const x=pad+ci*(colW+pad);
+  const prods=PILLAR_PRODUCTS[pil.key];
+
+  // Column bg
+  ctx.fillStyle=pil.color+'18';
+  ctx.strokeStyle=pil.color+'40'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.roundRect(x,startY,colW,colH,10); ctx.fill(); ctx.stroke();
+
+  // Header
+  const hdrGrad=ctx.createLinearGradient(x,startY,x+colW,startY);
+  hdrGrad.addColorStop(0,pil.color); hdrGrad.addColorStop(1,pil.color+'CC');
+  ctx.fillStyle=hdrGrad;
+  ctx.beginPath(); ctx.roundRect(x,startY,colW,44,[10,10,0,0]); ctx.fill();
+  ctx.fillStyle='#fff'; ctx.font='bold 14px Segoe UI, system-ui, sans-serif';
+  ctx.fillText(`${pil.emoji}  ${pil.label}`,x+14,startY+28);
+
+  // Product items
+  const itemH=44, itemPad=8, listStartY=startY+54;
+  const maxItems=Math.floor((colH-60)/itemH);
+  prods.slice(0,maxItems).forEach((p,pi)=>{
+   const iy=listStartY+pi*itemH;
+   const ix=x+itemPad;
+   const iw=colW-itemPad*2;
+
+   // Card bg
+   ctx.fillStyle='rgba(15,23,42,0.6)';
+   ctx.strokeStyle=pil.color+'30'; ctx.lineWidth=1;
+   ctx.beginPath(); ctx.roundRect(ix,iy,iw,itemH-4,6); ctx.fill(); ctx.stroke();
+
+   // Left accent bar
+   ctx.fillStyle=pil.color;
+   ctx.beginPath(); ctx.roundRect(ix,iy,3,itemH-4,[3,0,0,3]); ctx.fill();
+
+   // Icon + name
+   ctx.font='14px serif'; ctx.fillText(p.icon,ix+10,iy+20);
+   ctx.fillStyle='#F1F5F9'; ctx.font='bold 11px Segoe UI, system-ui, sans-serif';
+   const name=p.name.length>28?p.name.substring(0,26)+'…':p.name;
+   ctx.fillText(name,ix+30,iy+17);
+
+   // Tier + price hint
+   const tierColors={free:'#16A34A',budget:'#0891B2',standard:'#2563EB',premium:'#D97706',variable:'#6B7280'};
+   ctx.fillStyle=tierColors[p.tier]||'#6B7280';
+   ctx.font='9px Segoe UI, system-ui, sans-serif';
+   ctx.fillText(p.tier.toUpperCase(),ix+30,iy+30);
+   if(p.isNew){ctx.fillStyle='#FCD34D';ctx.font='bold 9px Segoe UI, system-ui, sans-serif';ctx.fillText('⭐ NEW',ix+iw-55,iy+17);}
+
+   // WAF cost dots
+   ctx.fillStyle='#334155';
+   for(let d=0;d<5;d++){ctx.beginPath();ctx.roundRect(ix+iw-50+d*9,iy+26,7,3,2);ctx.fill();}
+   ctx.fillStyle=pil.color;
+   for(let d=0;d<p.waf.cost;d++){ctx.beginPath();ctx.roundRect(ix+iw-50+d*9,iy+26,7,3,2);ctx.fill();}
+   ctx.fillStyle='#475569'; ctx.font='8px Segoe UI'; ctx.fillText('cost',ix+iw-52,iy+40);
+  });
+ });
+
+ // OneLake backbone
+ const olGrad=ctx.createLinearGradient(pad,onelakeY,W-pad,onelakeY);
+ olGrad.addColorStop(0,'#5B21B6'); olGrad.addColorStop(0.5,'#7C3AED'); olGrad.addColorStop(1,'#5B21B6');
+ ctx.fillStyle=olGrad;
+ ctx.beginPath(); ctx.roundRect(pad,onelakeY,W-pad*2,44,8); ctx.fill();
+ ctx.fillStyle='#fff'; ctx.font='bold 13px Segoe UI, system-ui, sans-serif';
+ ctx.fillText('🏔️  OneLake — Single Data Truth  ·  All Rayfin app data  ·  Mirrored operational DBs  ·  Delta Parquet  ·  DirectLake → Power BI',pad+20,onelakeY+27);
+
+ // Connection arrows between pillars
+ drawArrow(ctx,'#0078D4',pad+colW/2,onelakeY,pad+pad+colW+colW/2,onelakeY-10,'Rayfin → OneLake',W,H);
+
+ // Legend
+ const lx=W-160, ly=startY+8;
+ ctx.fillStyle='rgba(15,23,42,0.7)'; ctx.beginPath(); ctx.roundRect(lx,ly,140,90,6); ctx.fill();
+ ctx.fillStyle='#94A3B8'; ctx.font='bold 9px Segoe UI'; ctx.fillText('WAF COST SCORE',lx+10,ly+16);
+ [{l:'5 — Free/Negligible',c:'#16A34A'},{l:'4 — Budget',c:'#0891B2'},{l:'3 — Standard',c:'#2563EB'},{l:'2 — Premium',c:'#D97706'},{l:'1 — Variable',c:'#6B7280'}].forEach((item,i)=>{
+  ctx.fillStyle=item.c; ctx.font='10px Segoe UI';
+  ctx.fillText('●',lx+10,ly+30+i*13);
+  ctx.fillStyle='#CBD5E1'; ctx.fillText(item.l,lx+22,ly+30+i*13);
+ });
+}
+
+function drawArrow(ctx,color,x1,y1,x2,y2,label,W,H){
+ ctx.strokeStyle=color+'80'; ctx.lineWidth=1.5;
+ ctx.setLineDash([4,4]);
+ ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+ ctx.setLineDash([]);
+}
+
+function drawLayers(ctx,W,H){
+ const bg=ctx.createLinearGradient(0,0,0,H);
+ bg.addColorStop(0,'#0B1E3F'); bg.addColorStop(1,'#0F172A');
+ ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+ ctx.fillStyle='#F1F5F9'; ctx.font='bold 22px Segoe UI, system-ui, sans-serif';
+ ctx.fillText('Microsoft Azure Layered Architecture — WMS/WMP 2026',50,40);
+
+ const layers=[
+  {label:'User Experience',color:'#0078D4',items:['Copilot Studio Agents','Power Apps Portals','Power BI Dashboards','Teams + M365 Copilot','Fabric IQ NL Queries']},
+  {label:'AI Services',color:'#0078D4',items:['Azure AI Foundry','GPT-4.1-nano / GPT-4o-mini / GPT-4o','AI Document Intelligence','Phi-4-mini (self-hosted)','GitHub Copilot Business']},
+  {label:'Application Services (Rayfin BaaS)',color:'#7C3AED',items:['Onboarding API','DocumentStatus API','SupplierMatch API','Tender API','ESGMetric API · AnomalyAlert API']},
+  {label:'Data Processing',color:'#7C3AED',items:['Fabric Eventstreams + Change Feeds','Data Factory (Agent-Ready)','OneLake Mirroring (Azure SQL + SharePoint)','Fabric Data Agents (service principal)','Azure AI Search S1 (RAG) · Cosmos DB']},
+  {label:'Data Foundation — OneLake',color:'#5B21B6',items:['OneLake Delta Parquet','Fabric DW GPU + T-SQL AI Functions','Microsoft Purview Governance','Power BI DirectLake','Azure AI Search Index']},
+  {label:'Infrastructure',color:'#059669',items:['Entra ID P1/P2 + External ID + Managed Identities','Azure Container Apps + Functions + Key Vault','App Insights + Log Analytics + Defender for Cloud','Microsoft Sentinel · Azure DevOps + GitHub Enterprise','M365 E3 (Teams · SharePoint · Exchange)']},
+ ];
+
+ const pad=30, layerH=Math.floor((H-80)/layers.length)-6;
+ layers.forEach((layer,i)=>{
+  const y=70+i*(layerH+6);
+  ctx.fillStyle=layer.color+'20';
+  ctx.strokeStyle=layer.color+'50'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.roundRect(pad,y,W-pad*2,layerH,8); ctx.fill(); ctx.stroke();
+
+  // Label bar
+  ctx.fillStyle=layer.color+'CC';
+  ctx.beginPath(); ctx.roundRect(pad,y,200,layerH,[8,0,0,8]); ctx.fill();
+  ctx.fillStyle='#fff'; ctx.font='bold 11px Segoe UI, system-ui, sans-serif';
+  // Wrap label
+  const words=layer.label.split(' ');
+  let line=''; let lineY=y+18;
+  words.forEach(w=>{if((line+w).length>18){ctx.fillText(line.trim(),pad+8,lineY);line=w+' ';lineY+=14;}else line+=w+' ';});
+  if(line.trim()) ctx.fillText(line.trim(),pad+8,lineY);
+
+  // Items
+  layer.items.forEach((item,j)=>{
+   const ix=pad+210+j*Math.floor((W-pad*2-210)/5);
+   ctx.fillStyle='rgba(15,23,42,0.6)';
+   ctx.strokeStyle=layer.color+'30'; ctx.lineWidth=1;
+   ctx.beginPath(); ctx.roundRect(ix,y+8,Math.floor((W-pad*2-220)/5)-8,layerH-16,5); ctx.fill(); ctx.stroke();
+   ctx.fillStyle='#E2E8F0'; ctx.font='10px Segoe UI, system-ui, sans-serif';
+   // word wrap in box
+   const bw=Math.floor((W-pad*2-220)/5)-16;
+   const words2=item.split(' ');
+   let l2=''; let ly2=y+22;
+   words2.forEach(w=>{
+    if(ctx.measureText(l2+w).width>bw-4){ctx.fillText(l2.trim(),ix+8,ly2);l2=w+' ';ly2+=12;}
+    else l2+=w+' ';
+   });
+   if(l2.trim()) ctx.fillText(l2.trim(),ix+8,ly2);
+  });
+ });
+
+ // Footer
+ ctx.fillStyle='rgba(96,165,250,0.8)'; ctx.font='11px Segoe UI';
+ ctx.fillText('microsoft-azure-wms-wmp-2026 · Build 2026 + Rayfin · azure.microsoft.com',pad,H-10);
+}
+
+// ═══════════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════════
+function exportPNG(){
+ const canvas=document.getElementById('arch-canvas');
+ canvas.toBlob(blob=>{const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='microsoft-azure-wms-wmp-2026.png';a.click();URL.revokeObjectURL(url);},'image/png');
+}
+function exportSVG(){
+ // Generate SVG equivalent of the current canvas view
+ const view=document.getElementById('arch-view').value;
+ const W=1400,H=900;
+ const pillars=[
+  {key:'p1',color:'#0078D4',label:'Pillar 1 — AI & Apps'},
+  {key:'p2',color:'#7C3AED',label:'Pillar 2 — Data'},
+  {key:'p3',color:'#059669',label:'Pillar 3 — Infrastructure'}
+ ];
+ const pad=20,colW=(W-pad*2-pad*2)/3,startY=90;
+ let svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" font-family="Segoe UI, system-ui, sans-serif">`;
+ svg+=`<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0B1E3F"/><stop offset="1" stop-color="#0F172A"/></linearGradient></defs>`;
+ svg+=`<rect width="${W}" height="${H}" fill="url(#bg)"/>`;
+ svg+=`<text x="50" y="46" font-size="22" font-weight="bold" fill="#F1F5F9">Microsoft Azure Architecture — WMS/WMP 2026</text>`;
+ svg+=`<text x="50" y="68" font-size="12" fill="#60A5FA">Build 2026 + Rayfin Preview · Azure AI Foundry · Fabric Backbone</text>`;
+ pillars.forEach((pil,ci)=>{
+  const x=pad+ci*(colW+pad),colH=H-startY-70;
+  svg+=`<rect x="${x}" y="${startY}" width="${colW}" height="${colH}" rx="10" fill="${pil.color}18" stroke="${pil.color}40" stroke-width="1"/>`;
+  svg+=`<rect x="${x}" y="${startY}" width="${colW}" height="44" rx="10" fill="${pil.color}"/>`;
+  svg+=`<text x="${x+14}" y="${startY+28}" font-size="14" font-weight="bold" fill="#fff">${pil.label}</text>`;
+  const prods=PILLAR_PRODUCTS[pil.key];
+  const itemH=44,itemPad=8,listY=startY+54;
+  prods.slice(0,15).forEach((p,pi)=>{
+   const iy=listY+pi*itemH,ix=x+itemPad,iw=colW-itemPad*2;
+   svg+=`<rect x="${ix}" y="${iy}" width="${iw}" height="${itemH-4}" rx="6" fill="rgba(15,23,42,0.6)" stroke="${pil.color}30" stroke-width="1"/>`;
+   svg+=`<rect x="${ix}" y="${iy}" width="3" height="${itemH-4}" rx="2" fill="${pil.color}"/>`;
+   svg+=`<text x="${ix+30}" y="${iy+17}" font-size="11" font-weight="bold" fill="#F1F5F9">${p.name.length>28?p.name.substring(0,26)+'…':p.name}</text>`;
+   const tc={free:'#16A34A',budget:'#0891B2',standard:'#2563EB',premium:'#D97706',variable:'#6B7280'}[p.tier];
+   svg+=`<text x="${ix+30}" y="${iy+30}" font-size="9" fill="${tc}">${p.tier.toUpperCase()}</text>`;
+   if(p.isNew) svg+=`<text x="${ix+iw-55}" y="${iy+17}" font-size="9" font-weight="bold" fill="#FCD34D">⭐ NEW</text>`;
+  });
+ });
+ // OneLake backbone
+ svg+=`<rect x="${pad}" y="${H-60}" width="${W-pad*2}" height="44" rx="8" fill="#7C3AED"/>`;
+ svg+=`<text x="${pad+20}" y="${H-33}" font-size="13" font-weight="bold" fill="#fff">🏔️  OneLake — Single Data Truth  ·  All Rayfin app data  ·  Mirrored operational DBs  ·  Delta Parquet  ·  DirectLake → Power BI</text>`;
+ svg+=`</svg>`;
+ const blob=new Blob([svg],{type:'image/svg+xml'});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement('a');a.href=url;a.download='microsoft-azure-wms-wmp-2026.svg';a.click();URL.revokeObjectURL(url);
+}
+
+// ═══════════════════════════════════════════════════
+// TABS + DARK MODE
+// ═══════════════════════════════════════════════════
+function switchTab(name,btn){
+ document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+ document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+ if(btn) btn.classList.add('active');
+ document.getElementById('tab-'+name).classList.add('active');
+ if(name==='arch') setTimeout(drawDiagram,50);
+}
+function toggleDark(){document.body.toggleAttribute('data-dark');}
+
+// ═══════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+ renderProducts();
+ renderChips();
+ renderDecision();
+ renderScenarios();
+ // Set canvas intrinsic size early
+ const canvas=document.getElementById('arch-canvas');
+ canvas.style.width='100%';canvas.style.height='auto';
+});
+window.addEventListener('resize',()=>{if(document.getElementById('tab-arch').classList.contains('active')) drawDiagram();});
+</script>
+</body>
+</html>
